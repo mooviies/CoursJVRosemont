@@ -37,6 +37,9 @@ public class PersonnageCtrl : MonoBehaviour
 
     public void Avancer ()
     {
+        if (ToucheMurDroite())
+            return;
+        
         rb.velocity = new Vector2(vitesse, rb.velocity.y);
         if (!regarderDroite)
         {
@@ -47,6 +50,9 @@ public class PersonnageCtrl : MonoBehaviour
 
     public void Reculer ()
     {
+        if (ToucheMurGauche())
+            return;
+        
         rb.velocity = new Vector2(-vitesse, rb.velocity.y);
 
         if (regarderDroite)
@@ -113,6 +119,50 @@ public class PersonnageCtrl : MonoBehaviour
         }
 
         Debug.DrawRay(collider.bounds.center, Vector2.down * (collider.bounds.extents.y + ajustement), rayColor);
+        Debug.Log(raycastHit.collider);
+
+        return raycastHit.collider != null;
+    }
+
+    private bool ToucheMurGauche()
+    {
+        float ajustement = 0.02f;
+        RaycastHit2D raycastHit = Physics2D.Raycast(collider.bounds.center, Vector2.left, 
+            collider.bounds.extents.y + ajustement, layerSol);
+
+        Color rayColor;
+        if (raycastHit.collider != null)
+        {
+            rayColor = Color.green;
+        }
+        else
+        {
+            rayColor = Color.red;
+        }
+
+        Debug.DrawRay(collider.bounds.center, Vector2.left * (collider.bounds.extents.y + ajustement), rayColor);
+        Debug.Log(raycastHit.collider);
+
+        return raycastHit.collider != null;
+    }
+    
+    private bool ToucheMurDroite()
+    {
+        float ajustement = 0.02f;
+        RaycastHit2D raycastHit = Physics2D.Raycast(collider.bounds.center, Vector2.right, 
+            collider.bounds.extents.y + ajustement, layerSol);
+
+        Color rayColor;
+        if (raycastHit.collider != null)
+        {
+            rayColor = Color.green;
+        }
+        else
+        {
+            rayColor = Color.red;
+        }
+
+        Debug.DrawRay(collider.bounds.center, Vector2.right * (collider.bounds.extents.y + ajustement), rayColor);
         Debug.Log(raycastHit.collider);
 
         return raycastHit.collider != null;

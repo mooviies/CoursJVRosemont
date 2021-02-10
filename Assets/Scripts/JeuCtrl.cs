@@ -12,7 +12,7 @@ public class JeuCtrl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        persoCtrl = GameObject.Find("Personnage").GetComponent<PersonnageCtrl>();
+        persoCtrl = GameObject.FindWithTag("Player").GetComponent<PersonnageCtrl>();
     }
 
     // Update is called once per frame
