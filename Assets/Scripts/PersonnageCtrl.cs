@@ -33,6 +33,13 @@ public class PersonnageCtrl : MonoBehaviour
     void FixedUpdate()
     {
         anim.SetFloat("deplacement", Mathf.Abs(rb.velocity.x));
+
+        if (RaycastUtil.DebugMode)
+        {
+            EstSurLeSol();
+            ToucheMurDroite();
+            ToucheMurGauche();
+        }
     }
 
     public void Avancer ()
@@ -104,67 +111,19 @@ public class PersonnageCtrl : MonoBehaviour
 
     private bool EstSurLeSol()
     {
-        float ajustement = 0.02f;
-        RaycastHit2D raycastHit = Physics2D.Raycast(collider.bounds.center, Vector2.down, 
-            collider.bounds.extents.y + ajustement, layerSol);
-
-        Color rayColor;
-        if (raycastHit.collider != null)
-        {
-            rayColor = Color.green;
-        }
-        else
-        {
-            rayColor = Color.red;
-        }
-
-        Debug.DrawRay(collider.bounds.center, Vector2.down * (collider.bounds.extents.y + ajustement), rayColor);
-        Debug.Log(raycastHit.collider);
-
-        return raycastHit.collider != null;
+        Bounds bounds = collider.bounds;
+        return RaycastUtil.TesterCollision2D(bounds.center, Vector2.down, bounds.extents.y, layerSol);
     }
 
     private bool ToucheMurGauche()
     {
-        float ajustement = 0.02f;
-        RaycastHit2D raycastHit = Physics2D.Raycast(collider.bounds.center, Vector2.left, 
-            collider.bounds.extents.y + ajustement, layerSol);
-
-        Color rayColor;
-        if (raycastHit.collider != null)
-        {
-            rayColor = Color.green;
-        }
-        else
-        {
-            rayColor = Color.red;
-        }
-
-        Debug.DrawRay(collider.bounds.center, Vector2.left * (collider.bounds.extents.y + ajustement), rayColor);
-        Debug.Log(raycastHit.collider);
-
-        return raycastHit.collider != null;
+        Bounds bounds = collider.bounds;
+        return RaycastUtil.TesterCollision2D(bounds.center, Vector2.left, bounds.extents.x, layerSol);
     }
     
     private bool ToucheMurDroite()
     {
-        float ajustement = 0.02f;
-        RaycastHit2D raycastHit = Physics2D.Raycast(collider.bounds.center, Vector2.right, 
-            collider.bounds.extents.y + ajustement, layerSol);
-
-        Color rayColor;
-        if (raycastHit.collider != null)
-        {
-            rayColor = Color.green;
-        }
-        else
-        {
-            rayColor = Color.red;
-        }
-
-        Debug.DrawRay(collider.bounds.center, Vector2.right * (collider.bounds.extents.y + ajustement), rayColor);
-        Debug.Log(raycastHit.collider);
-
-        return raycastHit.collider != null;
+        Bounds bounds = collider.bounds;
+        return RaycastUtil.TesterCollision2D(bounds.center, Vector2.right, bounds.extents.x, layerSol);
     }
 }

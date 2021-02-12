@@ -38,9 +38,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 35038597
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: New Layer
+  - name: Objects
+    uniqueID: 4027556537
+    locked: 0
+  - name: Enemi
+    uniqueID: 1869461085
+    locked: 0
+  - name: Player
     uniqueID: 2645126125
     locked: 0

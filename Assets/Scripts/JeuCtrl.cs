@@ -13,6 +13,8 @@ public class JeuCtrl : MonoBehaviour
     void Start()
     {
         persoCtrl = GameObject.FindWithTag("Player").GetComponent<PersonnageCtrl>();
+        RaycastUtil.DebugMode = true;
+        RaycastUtil.VerboseMode = true;
     }
 
     // Update is called once per frame
