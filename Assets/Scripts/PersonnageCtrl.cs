@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -125,5 +126,14 @@ public class PersonnageCtrl : MonoBehaviour
     {
         Bounds bounds = collider.bounds;
         return RaycastUtil.TesterCollision2D(bounds.center, Vector2.right, bounds.extents.x, layerSol);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Collectible collectible = other.GetComponent<Collectible>();
+        if (collectible)
+        {
+            collectible.Collect();
+        }
     }
 }
