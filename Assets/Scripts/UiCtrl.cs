@@ -38,7 +38,7 @@ public class UiCtrl : MonoBehaviour
     
     public int MaxHealth
     {
-        set => healthSlider.maxValue = 0;
+        set => healthSlider.maxValue = value;
     }
     
     public int Health

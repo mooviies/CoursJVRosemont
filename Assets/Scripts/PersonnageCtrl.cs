@@ -3,6 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Classe représentant le personnage du jeu
+///
+/// Contient toutes les informations sur l'état duy personnage (sa vie, sa vitesse, etc)
+/// Permet le contrôle du personnage via les différentes méthodes (sauter, marcher, courir , attaquer)
+/// </summary>
 public class PersonnageCtrl : MonoBehaviour
 {
     [SerializeField] private float vitesse = 2f;
@@ -13,27 +19,42 @@ public class PersonnageCtrl : MonoBehaviour
 
     [SerializeField] private LayerMask layerSol;
 
-    private Rigidbody2D rb;
-    private Animator anim;
-    private CapsuleCollider2D collider;
+    [SerializeField] private int maxHealth = 100;
 
-    private bool regarderDroite = true;
-    private bool isJumping = false;
+    [SerializeField] private float tempInvincibilite = 2;
 
-    private float vitesseSaut;
+    private Rigidbody2D _rb;
+    private Animator _anim;
+    private CapsuleCollider2D _collider;
+    private UiCtrl _uiCtrl;
+
+    private bool _regarderDroite = true;
+    private bool _isJumping = false;
+
+    private float _vitesseSaut;
+
+    private int health;
+
+    private bool _estInvincible = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-        collider = GetComponent<CapsuleCollider2D>();
+        _rb = GetComponent<Rigidbody2D>();
+        _anim = GetComponent<Animator>();
+        _collider = GetComponent<CapsuleCollider2D>();
+        _uiCtrl = GameObject.FindWithTag("UI").GetComponent<UiCtrl>();
+        health = maxHealth;
+
+        _uiCtrl.MinHealth = 0;
+        _uiCtrl.MaxHealth = maxHealth;
+        _uiCtrl.Health = maxHealth;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        anim.SetFloat("deplacement", Mathf.Abs(rb.velocity.x));
+        _anim.SetFloat("deplacement", Mathf.Abs(_rb.velocity.x));
 
         if (RaycastUtil.DebugMode)
         {
@@ -43,15 +64,28 @@ public class PersonnageCtrl : MonoBehaviour
         }
     }
 
+    public void RecevoirDegat(int degats)
+    {
+        if (_estInvincible) return;
+        
+        health -= degats;
+        _uiCtrl.Health = health;
+        _estInvincible = true;
+        StartCoroutine(RendreVulnerable());
+    }
+
+    /// <summary>
+    /// Déplace le personnage vers la droite
+    /// </summary>
     public void Avancer ()
     {
         if (ToucheMurDroite())
             return;
         
-        rb.velocity = new Vector2(vitesse, rb.velocity.y);
-        if (!regarderDroite)
+        _rb.velocity = new Vector2(vitesse, _rb.velocity.y);
+        if (!_regarderDroite)
         {
-            regarderDroite = true;
+            _regarderDroite = true;
             Retourner();
         }
     }
@@ -61,11 +95,11 @@ public class PersonnageCtrl : MonoBehaviour
         if (ToucheMurGauche())
             return;
         
-        rb.velocity = new Vector2(-vitesse, rb.velocity.y);
+        _rb.velocity = new Vector2(-vitesse, _rb.velocity.y);
 
-        if (regarderDroite)
+        if (_regarderDroite)
         {
-            regarderDroite = false;
+            _regarderDroite = false;
             Retourner();
         }
     }
@@ -79,52 +113,59 @@ public class PersonnageCtrl : MonoBehaviour
 
     public void Attaquer()
     {
-        anim.SetTrigger("attaque");
+        _anim.SetTrigger("attaque");
     }
 
     public void SauterDebut()
     {
-        if (!isJumping && EstSurLeSol())
+        if (!_isJumping && EstSurLeSol())
         {
-            isJumping = true;
-            vitesseSaut = vitesseSautInitiale;
+            _isJumping = true;
+            _vitesseSaut = vitesseSautInitiale;
         }
     }
 
     public void Sauter()
     {
-        if (isJumping)
+        if (_isJumping)
         {
-            rb.velocity += Vector2.up * vitesseSaut;
-            vitesseSaut -= amortiSaut;
-            if (vitesseSaut < 0)
+            _rb.velocity += Vector2.up * _vitesseSaut;
+            _vitesseSaut -= amortiSaut;
+            if (_vitesseSaut < 0)
             {
-                vitesseSaut = 0;
-                isJumping = false;
+                _vitesseSaut = 0;
+                _isJumping = false;
             }
         }
     }
 
     public void SauterFin()
     {
-        isJumping = false;
+        _isJumping = false;
+    }
+
+    private IEnumerator RendreVulnerable()
+    {
+        yield return new WaitForSeconds(tempInvincibilite);
+
+        _estInvincible = false;
     }
 
     private bool EstSurLeSol()
     {
-        Bounds bounds = collider.bounds;
+        Bounds bounds = _collider.bounds;
         return RaycastUtil.TesterCollision2D(bounds.center, Vector2.down, bounds.extents.y, layerSol);
     }
 
     private bool ToucheMurGauche()
     {
-        Bounds bounds = collider.bounds;
+        Bounds bounds = _collider.bounds;
         return RaycastUtil.TesterCollision2D(bounds.center, Vector2.left, bounds.extents.x, layerSol);
     }
     
     private bool ToucheMurDroite()
     {
-        Bounds bounds = collider.bounds;
+        Bounds bounds = _collider.bounds;
         return RaycastUtil.TesterCollision2D(bounds.center, Vector2.right, bounds.extents.x, layerSol);
     }
 
@@ -134,6 +175,15 @@ public class PersonnageCtrl : MonoBehaviour
         if (collectible)
         {
             collectible.Collect();
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D other)
+    {
+        EnemyCtrl enemyCtrl = other.gameObject.GetComponent<EnemyCtrl>();
+        if (enemyCtrl)
+        {
+            RecevoirDegat(10);
         }
     }
 }
